@@ -27,10 +27,14 @@ dependencies:
 
 dev_dependencies:
   moor_generator:
+    path: /Users/elvislee/workspace/dart/moor/moor_generator
   build_runner:
   flutter_test:
     sdk: flutter
 
+dependency_overrides:
+  moor:
+    path: /Users/elvislee/workspace/dart/moor/moor
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

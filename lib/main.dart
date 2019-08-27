@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:trial_moor/users_dao.dart';
 import 'package:trial_moor/vd_database.dart';
 
-void main() {
+void main() async {
+  final db = VDDatabase();
 
-  final db = VDDatabase(){
+  db.usersDao.foo();
+  db.into(db.users).insert(User(id: 'ggyy', name: 'Elvis5566'));
+  List<User> users = await db.select(db.users).get();
 
-  };
+  for (final user in users) {
+    print("gggg $user");
+  }
 
   runApp(MyApp());
 }
