@@ -1,28 +1,62 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:moor_flutter/moor_flutter.dart' as moor;
+import 'package:trial_moor/address.dart';
 import 'package:trial_moor/preference.dart';
 import 'package:trial_moor/users_dao.dart';
 import 'package:trial_moor/vd_database.dart';
 
 void main() async {
-  final db = VDDatabase();
+  final db = VDDatabase.sharedInstance;
 
   Preference preference = Preference();
   preference.selectedTheme = 'Dark';
   preference.receiveEmails = true;
+
+  Address address = Address();
+  address.id = 1;
+  address.country = 'Taiwan';
+  address.dirty = true;
+
+  Address address2 = Address();
+  address2.id = 2;
+  address2.country = 'Japan';
+  await address2.save();
+
+  List<Address> addresses = await db.addresssDao.loadAll();
+  print("addresses size: ${addresses.length}");
+  for (final address in addresses) {
+    print("for address $address");
+  }
 
   User user = User();
   user.id = 'ggyy';
   user.name = 'Elvis5566';
   user.dirty = true;
   user.preference = preference;
-  db.usersDao.add(user);
-  List<User> users = await db.usersDao.list();
+  user.address = address;
 
-  for (final user in users) {
-    print("gggg ${user.toString()}");
-  }
+  await db.usersDao.upsert(user);
+
+  await printUsers(db);
+
+  UsersCompanion companion = user.createCompanion(true);
+  await db.usersDao.foo(companion.copyWith(addressId: moor.Value(2)));
+
+  print("=================");
+
+  await printUsers(db);
 
   runApp(MyApp());
+}
+
+Future printUsers(VDDatabase db) async {
+  List<User> users = await db.usersDao.loadAll();
+  print("users size: ${users.length}");
+  for (final user in users) {
+    print("for user $user");
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -13,7 +13,10 @@ User _$UserFromJson(Map<String, dynamic> json) {
     ..name = json['name'] as String
     ..preference = json['preference'] == null
         ? null
-        : Preference.fromJson(json['preference'] as Map<String, dynamic>);
+        : Preference.fromJson(json['preference'] as Map<String, dynamic>)
+    ..address = json['address'] == null
+        ? null
+        : Address.fromJson(json['address'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$UserToJson(User instance) {
@@ -29,6 +32,7 @@ Map<String, dynamic> _$UserToJson(User instance) {
   writeNotNull('id', instance.id);
   writeNotNull('name', instance.name);
   writeNotNull('preference', instance.preference);
+  writeNotNull('address', instance.address);
   return val;
 }
 
@@ -39,6 +43,43 @@ Map<String, dynamic> _$UserToJson(User instance) {
 mixin _$UsersDaoMixin on DatabaseAccessor<VDDatabase> {
   Users _users;
   Users get users => _users ??= Users(db);
+  Future upsert(User instance) {
+    return transaction((_) async {
+      await instance.address?.save();
+      await into(users).insert(instance, orReplace: true);
+    });
+  }
+
+  Future<List<User>> loadAll(
+      {Expression<bool, BoolType> where(Users table),
+      int limit,
+      int offset,
+      List<OrderClauseGenerator<Users>> orderBy}) {
+    final statement = select(users);
+    if (where != null) {
+      statement.where(where);
+    }
+    if (limit != null) {
+      statement.limit(limit, offset: offset);
+    }
+    if (orderBy != null) {
+      statement.orderBy(orderBy);
+    }
+    final joins = users.getJoins();
+    return joins.length == 0
+        ? statement.get()
+        : statement.join(joins).get().then((rows) {
+            return rows.map((row) => row.readTable(users)).toList();
+          });
+  }
+
+  Future<User> load(key) async {
+    final list = await (select(users)
+          ..where((table) => table.primaryKey.first.equals(key)))
+        .get();
+    return list.length > 0 ? list.first : null;
+  }
+
   List<TableInfo> get tables => [users];
 }
 UsersCompanion _$createCompanion(User instance, bool nullToAbsent) {
@@ -52,6 +93,9 @@ UsersCompanion _$createCompanion(User instance, bool nullToAbsent) {
     preference: instance.preference == null && nullToAbsent
         ? const Value.absent()
         : Value(instance.preference),
+    addressId: instance.address == null && nullToAbsent
+        ? const Value.absent()
+        : Value(instance.address.id),
     dirty: instance.dirty == null && nullToAbsent
         ? const Value.absent()
         : Value(instance.dirty),
@@ -62,22 +106,26 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> id;
   final Value<String> name;
   final Value<Preference> preference;
+  final Value<int> addressId;
   final Value<bool> dirty;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.preference = const Value.absent(),
+    this.addressId = const Value.absent(),
     this.dirty = const Value.absent(),
   });
   UsersCompanion copyWith(
       {Value<String> id,
       Value<String> name,
       Value<Preference> preference,
+      Value<int> addressId,
       Value<bool> dirty}) {
     return UsersCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       preference: preference ?? this.preference,
+      addressId: addressId ?? this.addressId,
       dirty: dirty ?? this.dirty,
     );
   }
@@ -91,11 +139,8 @@ class Users extends Table with TableInfo<Users, User> {
   GeneratedTextColumn _id;
   GeneratedTextColumn get id => _id ??= _constructId();
   GeneratedTextColumn _constructId() {
-    return GeneratedTextColumn(
-      'id',
-      $tableName,
-      false,
-    );
+    return GeneratedTextColumn('id', $tableName, false,
+        declaredAsPrimaryKey: true);
   }
 
   final VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -120,6 +165,17 @@ class Users extends Table with TableInfo<Users, User> {
     );
   }
 
+  final VerificationMeta _addressIdMeta = const VerificationMeta('addressId');
+  GeneratedIntColumn _addressId;
+  GeneratedIntColumn get addressId => _addressId ??= _constructAddressId();
+  GeneratedIntColumn _constructAddressId() {
+    return GeneratedIntColumn(
+      'addressId',
+      $tableName,
+      true,
+    );
+  }
+
   final VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
   GeneratedBoolColumn _dirty;
   GeneratedBoolColumn get dirty => _dirty ??= _constructDirty();
@@ -132,7 +188,8 @@ class Users extends Table with TableInfo<Users, User> {
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, name, preference, dirty];
+  List<GeneratedColumn> get $columns =>
+      [id, name, preference, addressId, dirty];
   @override
   Users get asDslTable => this;
   @override
@@ -155,6 +212,12 @@ class Users extends Table with TableInfo<Users, User> {
       context.missing(_nameMeta);
     }
     context.handle(_preferenceMeta, const VerificationResult.success());
+    if (d.addressId.present) {
+      context.handle(_addressIdMeta,
+          addressId.isAcceptableValue(d.addressId.value, _addressIdMeta));
+    } else if (addressId.isRequired && isInserting) {
+      context.missing(_addressIdMeta);
+    }
     if (d.dirty.present) {
       context.handle(
           _dirtyMeta, dirty.isAcceptableValue(d.dirty.value, _dirtyMeta));
@@ -174,8 +237,10 @@ class Users extends Table with TableInfo<Users, User> {
 
   User fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
+    final joinInfo = buildJoinInfo();
     final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
+    final intType = db.typeSystem.forDartType<int>();
     final boolType = db.typeSystem.forDartType<bool>();
     User model = User();
     model.id = stringType.mapFromDatabaseResponse(data['${effectivePrefix}id']);
@@ -183,9 +248,18 @@ class Users extends Table with TableInfo<Users, User> {
         stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']);
     model.preference = Users.$converter0.mapToDart(stringType
         .mapFromDatabaseResponse(data['${effectivePrefix}preference']));
+    model.address = joinInfo[addressId]
+        .map(data, tablePrefix: joinInfo[addressId].$tableName);
     model.dirty =
         boolType.mapFromDatabaseResponse(data['${effectivePrefix}dirty']);
     return model;
+  }
+
+  @override
+  Map<GeneratedColumn, TableInfo> buildJoinInfo() {
+    return {
+      addressId: Addresss(_db, '${$tableName}_address'),
+    };
   }
 
   @override
@@ -202,6 +276,9 @@ class Users extends Table with TableInfo<Users, User> {
       map['preference'] =
           Variable<String, StringType>(converter.mapToSql(d.preference.value));
     }
+    if (d.addressId.present) {
+      map['addressId'] = Variable<int, IntType>(d.addressId.value);
+    }
     if (d.dirty.present) {
       map['dirty'] = Variable<bool, BoolType>(d.dirty.value);
     }
@@ -214,4 +291,6 @@ class Users extends Table with TableInfo<Users, User> {
   }
 
   static PreferenceConverter $converter0 = const PreferenceConverter();
+  @override
+  final bool dontWriteConstraints = true;
 }

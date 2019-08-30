@@ -161,6 +161,10 @@ abstract class _$VDDatabase extends GeneratedDatabase {
   $CarsTable get cars => _cars ??= $CarsTable(this);
   UsersDao _usersDao;
   UsersDao get usersDao => _usersDao ??= UsersDao(this as VDDatabase);
+  AddresssDao _addresssDao;
+  AddresssDao get addresssDao =>
+      _addresssDao ??= AddresssDao(this as VDDatabase);
   @override
-  List<TableInfo> get allTables => [cars, ...usersDao.tables];
+  List<TableInfo> get allTables =>
+      [cars, ...usersDao.tables, ...addresssDao.tables];
 }
