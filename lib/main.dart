@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:trial_moor/preference.dart';
 import 'package:trial_moor/users_dao.dart';
 import 'package:trial_moor/vd_database.dart';
 
 void main() async {
   final db = VDDatabase();
 
-  db.usersDao.foo();
-  db.into(db.users).insert(User(id: 'ggyy', name: 'Elvis5566'));
-  List<User> users = await db.select(db.users).get();
+  Preference preference = Preference();
+  preference.selectedTheme = 'Dark';
+  preference.receiveEmails = true;
+
+  User user = User();
+  user.id = 'ggyy';
+  user.name = 'Elvis5566';
+  user.dirty = true;
+  user.preference = preference;
+  db.usersDao.add(user);
+  List<User> users = await db.usersDao.list();
 
   for (final user in users) {
-    print("gggg $user");
+    print("gggg ${user.toString()}");
   }
 
   runApp(MyApp());

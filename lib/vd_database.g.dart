@@ -7,7 +7,6 @@ part of 'vd_database.dart';
 // **************************************************************************
 
 // ignore_for_file: unnecessary_brace_in_string_interps
-
 class Car extends DataClass implements Insertable<Car> {
   final int id;
   final String name;
@@ -158,12 +157,10 @@ class $CarsTable extends Cars with TableInfo<$CarsTable, Car> {
 
 abstract class _$VDDatabase extends GeneratedDatabase {
   _$VDDatabase(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
-  $UsersTable _users;
-  $UsersTable get users => _users ??= $UsersTable(this);
   $CarsTable _cars;
   $CarsTable get cars => _cars ??= $CarsTable(this);
   UsersDao _usersDao;
   UsersDao get usersDao => _usersDao ??= UsersDao(this as VDDatabase);
   @override
-  List<TableInfo> get allTables => [users, cars];
+  List<TableInfo> get allTables => [cars, ...usersDao.tables];
 }

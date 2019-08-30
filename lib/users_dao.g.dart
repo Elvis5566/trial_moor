@@ -3,42 +3,92 @@
 part of 'users_dao.dart';
 
 // **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+User _$UserFromJson(Map<String, dynamic> json) {
+  return User()
+    ..dirty = json['dirty'] as bool
+    ..id = json['id'] as String
+    ..name = json['name'] as String
+    ..preference = json['preference'] == null
+        ? null
+        : Preference.fromJson(json['preference'] as Map<String, dynamic>);
+}
+
+Map<String, dynamic> _$UserToJson(User instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('dirty', instance.dirty);
+  writeNotNull('id', instance.id);
+  writeNotNull('name', instance.name);
+  writeNotNull('preference', instance.preference);
+  return val;
+}
+
+// **************************************************************************
 // DaoGenerator
 // **************************************************************************
 
 mixin _$UsersDaoMixin on DatabaseAccessor<VDDatabase> {
-  $UsersTable get users => db.users;
+  Users _users;
+  Users get users => _users ??= Users(db);
+  List<TableInfo> get tables => [users];
+}
+UsersCompanion _$createCompanion(User instance, bool nullToAbsent) {
+  return UsersCompanion(
+    id: instance.id == null && nullToAbsent
+        ? const Value.absent()
+        : Value(instance.id),
+    name: instance.name == null && nullToAbsent
+        ? const Value.absent()
+        : Value(instance.name),
+    preference: instance.preference == null && nullToAbsent
+        ? const Value.absent()
+        : Value(instance.preference),
+    dirty: instance.dirty == null && nullToAbsent
+        ? const Value.absent()
+        : Value(instance.dirty),
+  );
 }
 
 class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> id;
   final Value<String> name;
+  final Value<Preference> preference;
+  final Value<bool> dirty;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.preference = const Value.absent(),
+    this.dirty = const Value.absent(),
   });
-  UsersCompanion copyWith({Value<String> id, Value<String> name}) {
+  UsersCompanion copyWith(
+      {Value<String> id,
+      Value<String> name,
+      Value<Preference> preference,
+      Value<bool> dirty}) {
     return UsersCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      preference: preference ?? this.preference,
+      dirty: dirty ?? this.dirty,
     );
   }
 }
 
-class Users extends Table {
-//  IntColumn get id => integer().autoIncrement()();
-  TextColumn get id => text()();
-
-  TextColumn get name => text().withLength(min: 6, max: 32)();
-}
-
-class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+class Users extends Table with TableInfo<Users, User> {
   final GeneratedDatabase _db;
   final String _alias;
-  $UsersTable(this._db, [this._alias]);
+  Users(this._db, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   GeneratedTextColumn _id;
-  @override
   GeneratedTextColumn get id => _id ??= _constructId();
   GeneratedTextColumn _constructId() {
     return GeneratedTextColumn(
@@ -50,17 +100,41 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
 
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   GeneratedTextColumn _name;
-  @override
   GeneratedTextColumn get name => _name ??= _constructName();
   GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn('name', $tableName, false,
-        minTextLength: 6, maxTextLength: 32);
+    return GeneratedTextColumn(
+      'name',
+      $tableName,
+      true,
+    );
+  }
+
+  final VerificationMeta _preferenceMeta = const VerificationMeta('preference');
+  GeneratedTextColumn _preference;
+  GeneratedTextColumn get preference => _preference ??= _constructPreference();
+  GeneratedTextColumn _constructPreference() {
+    return GeneratedTextColumn(
+      'preference',
+      $tableName,
+      true,
+    );
+  }
+
+  final VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
+  GeneratedBoolColumn _dirty;
+  GeneratedBoolColumn get dirty => _dirty ??= _constructDirty();
+  GeneratedBoolColumn _constructDirty() {
+    return GeneratedBoolColumn(
+      'dirty',
+      $tableName,
+      true,
+    );
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  List<GeneratedColumn> get $columns => [id, name, preference, dirty];
   @override
-  $UsersTable get asDslTable => this;
+  Users get asDslTable => this;
   @override
   String get $tableName => _alias ?? 'users';
   @override
@@ -80,15 +154,38 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     } else if (name.isRequired && isInserting) {
       context.missing(_nameMeta);
     }
+    context.handle(_preferenceMeta, const VerificationResult.success());
+    if (d.dirty.present) {
+      context.handle(
+          _dirtyMeta, dirty.isAcceptableValue(d.dirty.value, _dirtyMeta));
+    } else if (dirty.isRequired && isInserting) {
+      context.missing(_dirtyMeta);
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   User map(Map<String, dynamic> data, {String tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return User.fromData(data, _db, prefix: effectivePrefix);
+    return fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  User fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final stringType = db.typeSystem.forDartType<String>();
+    final boolType = db.typeSystem.forDartType<bool>();
+    User model = User();
+    model.id = stringType.mapFromDatabaseResponse(data['${effectivePrefix}id']);
+    model.name =
+        stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']);
+    model.preference = Users.$converter0.mapToDart(stringType
+        .mapFromDatabaseResponse(data['${effectivePrefix}preference']));
+    model.dirty =
+        boolType.mapFromDatabaseResponse(data['${effectivePrefix}dirty']);
+    return model;
   }
 
   @override
@@ -100,11 +197,21 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (d.name.present) {
       map['name'] = Variable<String, StringType>(d.name.value);
     }
+    if (d.preference.present) {
+      final converter = Users.$converter0;
+      map['preference'] =
+          Variable<String, StringType>(converter.mapToSql(d.preference.value));
+    }
+    if (d.dirty.present) {
+      map['dirty'] = Variable<bool, BoolType>(d.dirty.value);
+    }
     return map;
   }
 
   @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(_db, alias);
+  Users createAlias(String alias) {
+    return Users(_db, alias);
   }
+
+  static PreferenceConverter $converter0 = const PreferenceConverter();
 }

@@ -14,7 +14,7 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -24,11 +24,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   moor_flutter:
+  json_annotation:
 
 dev_dependencies:
   moor_generator:
     path: /Users/elvislee/workspace/dart/moor/moor_generator
   build_runner:
+  json_serializable:
   flutter_test:
     sdk: flutter
 
