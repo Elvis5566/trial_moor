@@ -36,7 +36,11 @@ dev_dependencies:
 
 dependency_overrides:
   moor:
-    path: /Users/elvislee/workspace/dart/moor/moor
+#    path: /Users/elvislee/workspace/dart/moor/moor
+    git:
+      url: https://github.com/Elvis5566/moor
+      ref: 508861347d40cb4f99ccac99d6960c4706c4ffb5
+      path: moor
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

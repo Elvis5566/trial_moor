@@ -280,9 +280,11 @@ packages:
   moor:
     dependency: "direct overridden"
     description:
-      path: "/Users/elvislee/workspace/dart/moor/moor"
-      relative: false
-    source: path
+      path: moor
+      ref: "508861347d40cb4f99ccac99d6960c4706c4ffb5"
+      resolved-ref: "508861347d40cb4f99ccac99d6960c4706c4ffb5"
+      url: "https://github.com/Elvis5566/moor"
+    source: git
     version: "1.7.1"
   moor_flutter:
     dependency: "direct main"

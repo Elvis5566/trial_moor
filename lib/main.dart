@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:moor_flutter/moor_flutter.dart' as moor;
 import 'package:trial_moor/address.dart';
 import 'package:trial_moor/preference.dart';
-import 'package:trial_moor/users_dao.dart';
+import 'package:trial_moor/user.dart';
 import 'package:trial_moor/vd_database.dart';
 
 void main() async {

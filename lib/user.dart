@@ -7,7 +7,7 @@ import 'package:trial_moor/preference.dart';
 import 'package:trial_moor/preference_converter.dart';
 import 'package:trial_moor/vd_database.dart';
 
-part 'users_dao.g.dart';
+part 'user.g.dart';
 
 @JsonSerializable(includeIfNull: false)
 class User extends DataClass with DirtyColumn, DBSave implements Insertable<User> {

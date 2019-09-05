@@ -1,11 +1,10 @@
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:trial_moor/address.dart';
-import 'package:trial_moor/car.dart';
-import 'package:trial_moor/users_dao.dart';
+import 'package:trial_moor/user.dart';
 
 part 'vd_database.g.dart';
 
-@UseMoor(tables: [Cars], daos: [UsersDao, AddresssDao])
+@UseMoor(daos: [UsersDao, AddresssDao])
 class VDDatabase extends _$VDDatabase {
   VDDatabase() : super(FlutterQueryExecutor.inDatabaseFolder(path: 'db.sqlite'));
 
