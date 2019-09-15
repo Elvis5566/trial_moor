@@ -39,7 +39,7 @@ dependency_overrides:
 #    path: /Users/elvislee/workspace/dart/moor/moor
     git:
       url: https://github.com/Elvis5566/moor
-      ref: 508861347d40cb4f99ccac99d6960c4706c4ffb5
+      ref: 58184d79efccaf07f4fcc5316d28144915711c9d
       path: moor
 
 # For information on the generic Dart part of this file, see the

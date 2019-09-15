@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:moor_flutter/moor_flutter.dart' as moor;
@@ -6,6 +5,7 @@ import 'package:trial_moor/address.dart';
 import 'package:trial_moor/preference.dart';
 import 'package:trial_moor/user.dart';
 import 'package:trial_moor/vd_database.dart';
+
 
 void main() async {
   final db = VDDatabase.sharedInstance;
@@ -18,11 +18,6 @@ void main() async {
   address.id = 1;
   address.country = 'Taiwan';
   address.dirty = true;
-
-  Address address2 = Address();
-  address2.id = 2;
-  address2.country = 'Japan';
-  await address2.save();
 
   List<Address> addresses = await db.addresssDao.loadAll();
   print("addresses size: ${addresses.length}");
@@ -41,12 +36,21 @@ void main() async {
 
   await printUsers(db);
 
+  Address address2 = Address();
+  address2.id = 2;
+  address2.country = 'Japan';
+  await address2.save();
+
   UsersCompanion companion = user.createCompanion(true);
   await db.usersDao.foo(companion.copyWith(addressId: moor.Value(2)));
 
   print("=================");
 
   await printUsers(db);
+
+  for (final address in await db.addresssDao.loadAll(where: (t) => t.country.equals('Japan') & t.id.equals(2))) {
+    print(address);
+  }
 
   runApp(MyApp());
 }
