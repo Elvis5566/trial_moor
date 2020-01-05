@@ -28,7 +28,10 @@ dependencies:
 
 dev_dependencies:
   moor_generator:
-    path: /Users/elvislee/workspace/dart/moor/moor_generator
+    git:
+      url: https://github.com/Elvis5566/moor
+      ref: 948cc97262e9d261f6c23f1c157dd7e550f56b1a
+      path: moor_generator
   build_runner:
   json_serializable:
   flutter_test:
@@ -39,7 +42,7 @@ dependency_overrides:
 #    path: /Users/elvislee/workspace/dart/moor/moor
     git:
       url: https://github.com/Elvis5566/moor
-      ref: 58184d79efccaf07f4fcc5316d28144915711c9d
+      ref: 948cc97262e9d261f6c23f1c157dd7e550f56b1a
       path: moor
 
 # For information on the generic Dart part of this file, see the

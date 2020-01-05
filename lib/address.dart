@@ -19,10 +19,10 @@ class Address extends DataClass with DirtyColumn, DBSave implements Insertable<A
   static Address fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
 
   @override
-  Map<String, dynamic> toJson({ValueSerializer serializer = const ValueSerializer.defaults()}) => _$AddressToJson(this);
+  Map<String, dynamic> toJson() => _$AddressToJson(this);
 
   @override
-  T createCompanion<T extends UpdateCompanion<Address>>(bool nullToAbsent) => _$createCompanion(this, nullToAbsent) as T;
+  UpdateCompanion<Address> createCompanion(bool nullToAbsent) => _$createCompanion(this, nullToAbsent);
 
   @override
   String toString() => toJsonString();

@@ -29,7 +29,7 @@ class User extends DataClass with DirtyColumn, DBSave implements Insertable<User
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   @override
-  T createCompanion<T extends UpdateCompanion<User>>(bool nullToAbsent) => _$createCompanion(this, nullToAbsent) as T;
+  UpdateCompanion<User> createCompanion(bool nullToAbsent) => _$createCompanion(this, nullToAbsent);
 
   @override
   String toString() => toJsonString();

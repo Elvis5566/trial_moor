@@ -6,9 +6,9 @@ part of 'vd_database.dart';
 // MoorGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps
+// ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 abstract class _$VDDatabase extends GeneratedDatabase {
-  _$VDDatabase(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
+  _$VDDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   UsersDao _usersDao;
   UsersDao get usersDao => _usersDao ??= UsersDao(this as VDDatabase);
   AddresssDao _addresssDao;

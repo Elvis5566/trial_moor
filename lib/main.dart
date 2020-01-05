@@ -8,6 +8,8 @@ import 'package:trial_moor/vd_database.dart';
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final db = VDDatabase.sharedInstance;
 
   Preference preference = Preference();
